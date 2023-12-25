@@ -6,6 +6,7 @@
 #	Run format and lint checks against python files and fails
 #   if any problems detected. This will stop git from committing.
 #
+
 YELLOW='\033[1;33m'
 RED='\033[1;31m'
 GREEN='\033[1;32m'
