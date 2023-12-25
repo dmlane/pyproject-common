@@ -1,7 +1,7 @@
 ## Config
 export PROJECT_NAME = $(shell poetry version|cut -d" " -f1)
 PYTHON_FILES =  $(shell find src/ -type f -name '*.py')
-HELPER=.helpers
+export HELPER=.common/bin
 SRC_DIRS = src/$(PROJECT_NAME)
 export WORK_DIR = .make_files
 POETRY := $(shell command -v poetry 2> /dev/null)
