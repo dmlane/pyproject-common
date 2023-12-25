@@ -1,0 +1,35 @@
+# vim:syntax=bash filetype=sh
+# Common code for scripts
+
+shopt -s expand_aliases
+
+alias echoerr='>&2 echo'
+# Colors I use .......
+if [ -t 0 ] ; then
+    DARK_GREY=$'\e[1;30m'
+    DARK_GREEN=$'\e[0;32m'
+    BLUE=$'\e[1;34m'
+    GREEN=$'\e[1;32m'
+    YELLOW=$'\e[1;33m'
+    RED=$'\e[1;31m'
+    NC=$'\e[1;0m'
+fi
+highlight() {
+    # example usage:
+    # highlight "A ^highlighted^ mess^age"
+	sed -e "s/^\([^\^]\)/${GREEN}\1/" -e "s/\^\([^\^]*\)\^/${YELLOW}\1${GREEN}/g" -e "s/\^/${YELLOW}/" -e "s/$/${NC}/"  <<< "$1"
+}
+require_commands() {
+	local cmd
+	local problem_count=0
+	for cmd in $*
+	do
+		command -v $cmd >/dev/null 2>&1 && continue
+		(( problem_count++ ))
+		highlight "^${cmd}^ not installed"
+	done
+	[ $problem_count -gt 0 ] && fail "Cannot continue"
+}
+
+fail() { echo -e "${RED}$1 - aborting ??????????${NC}"; exit 1;}
+
