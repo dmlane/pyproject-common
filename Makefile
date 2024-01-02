@@ -1,6 +1,6 @@
 ## Config
 export PROJECT_NAME = $(shell poetry version|cut -d" " -f1)
-PYTHON_FILES =  $(shell find src/ -type f -name '*.py')
+PYTHON_FILES =  $(shell find src/ tests/ -type f -name '*.py')
 export HELPER=.common/bin
 SRC_DIRS = src/$(PROJECT_NAME)
 export WORK_DIR = .make_files
