@@ -14,23 +14,38 @@ DOCXX
 #                                            but needed by the project)
 require_commands poetry pyenv bumpver
 [ $WORK_DIR ] || fail "Expected to find WORK_DIR from MAKE environment"
+[ $SRC_DIRS ] || fail "Expected to find SRC_DIRS from MAKE environment"
 
+function rm_if_exists {
+	if [ "$1" == "-d" ] ; then
+		[ -d "$2" ] || return
+		highlight "    Removing directory ^$2^"
+		rm -rf "$2"
+		return
+	fi
+	[ -e "$1" ] || return
+	highlight "    Removing ^$1^"
+	rm "$1"
+	return
+}
+MKFLAG_VIRTUALENV=${WORK_DIR}/virtualenv.flg
 if [ "$1" == "-d" ] ; then
-	echo "    Removing virtualenv ${PROJECT_NAME}"
-	pyenv virtualenv-delete -f ${PROJECT_NAME} 2>/dev/null
-	rm poetry.lock
-	echo "    Removing local pyenv version"
-	rm .python-version 2>/dev/null
-	echo "    Removing caches and flags"
-	find . -type d -name "__pycache__" -exec rm -rf {} \;
-	rm -rf $WORK_DIR  2>/dev/null
-	rm -rf dist 2>/dev/null
+	[ -f $MKFLAG_VIRTUALENV ] && \
+		highlight "    Removing virtualenv ${PROJECT_NAME}" &&
+		pyenv virtualenv-delete -f ${PROJECT_NAME} 2>/dev/null &&\
+		rm  $MKFLAG_VIRTUALENV
+	rm_if_exists poetry.lock 
+	rm_if_exists .python-version 
+	find . -type d -name "__pycache__" -exec rm_if_exists -d {} \;
+	rm_if_exists -d dist
+	rm_if_exists -d $SRC_DIRS/build
+	rm_if_exists -d $SRC_DIRS/dist
+	rm_if_exists -d $WORK_DIR
 
 	exit 0
 fi
 
 [ ! -d $WORK_DIR ] && mkdir $WORK_DIR 
-MKFLAG_VIRTUALENV=${WORK_DIR}/virtualenv.flg
 
 if [ ! -f $MKFLAG_VIRTUALENV ] ; then
 	pyenv virtualenv $PROJECT_NAME
