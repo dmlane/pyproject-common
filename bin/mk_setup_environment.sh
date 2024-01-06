@@ -36,10 +36,11 @@ if [ "$1" == "-d" ] ; then
 		rm  $MKFLAG_VIRTUALENV
 	rm_if_exists poetry.lock 
 	rm_if_exists .python-version 
-	find . -type d -name "__pycache__" -exec rm_if_exists -d {} \;
-	rm_if_exists -d dist
+	rm_if_exists -d .pytest_cache
 	rm_if_exists -d $SRC_DIRS/build
 	rm_if_exists -d $SRC_DIRS/dist
+	rm_if_exists -d dist
+	find . -type d -name "__pycache__" -exec rm_if_exists  -d  {} \;
 	rm_if_exists -d $WORK_DIR
 
 	exit 0
