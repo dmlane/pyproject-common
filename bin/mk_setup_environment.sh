@@ -30,10 +30,11 @@ function rm_if_exists {
 }
 MKFLAG_VIRTUALENV=${WORK_DIR}/virtualenv.flg
 if [ "$1" == "-d" ] ; then
-	[ -f $MKFLAG_VIRTUALENV ] && \
+	[ -d /Users/dave/.pyenv/versions/${PROJECT_NAME} ] && \
+#	[ $MKFLAG_VIRTUALENV ] && \
 		highlight "    Removing virtualenv ${PROJECT_NAME}" &&
 		pyenv virtualenv-delete -f ${PROJECT_NAME} 2>/dev/null &&\
-		rm  $MKFLAG_VIRTUALENV
+		rm  $MKFLAG_VIRTUALENV 2>/dev/null
 	rm_if_exists poetry.lock 
 	rm_if_exists .python-version 
 	rm_if_exists -d .pytest_cache
@@ -46,7 +47,7 @@ if [ "$1" == "-d" ] ; then
 	exit 0
 fi
 
-[ ! -d $WORK_DIR ] && mkdir $WORK_DIR 
+[ ! -d $WORK_DIR ] && mkdir -p $WORK_DIR 
 
 if [ ! -f $MKFLAG_VIRTUALENV ] ; then
 	pyenv virtualenv $PROJECT_NAME

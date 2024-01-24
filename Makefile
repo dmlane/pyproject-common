@@ -3,7 +3,7 @@ export PROJECT_NAME = $(shell poetry version|cut -d" " -f1)
 PYTHON_FILES =  $(shell find src/ tests/ -type f -name '*.py')
 export HELPER=.common/bin
 export SRC_DIRS = src/$(subst dml-,,$(PROJECT_NAME))
-export WORK_DIR = .make_files
+export WORK_DIR = ${HOME}/.cache/dml.poetry/$(PROJECT_NAME)
 POETRY := $(shell command -v poetry 2> /dev/null)
 PYENV := $(shell command -v pyenv 2> /dev/null)
 -include $(WORK_DIR)/.versions
