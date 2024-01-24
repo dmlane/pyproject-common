@@ -41,7 +41,7 @@ def print_source_url(name, version):
 
 
 def process_packages():
-    """Process the packages in .make_files/poetry.packages.new"""
+    """Process the packages in ${WORK_DIR}/poetry.packages.new"""
     package = {}
     with open(SPEC_FILE, "r", encoding="latin-1") as f:
         recs = f.readlines()
