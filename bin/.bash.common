@@ -32,4 +32,6 @@ require_commands() {
 }
 
 fail() { echo -e "${RED}$1 - aborting ??????????${NC}"; exit 1;}
+export -f highlight fail require_commands
+export YELLOW GREEN RED 
 

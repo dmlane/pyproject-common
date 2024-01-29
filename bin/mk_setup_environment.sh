@@ -28,6 +28,8 @@ function rm_if_exists {
 	rm "$1"
 	return
 }
+export -f rm_if_exists
+
 MKFLAG_VIRTUALENV=${WORK_DIR}/virtualenv.flg
 if [ "$1" == "-d" ] ; then
 	[ -d /Users/dave/.pyenv/versions/${PROJECT_NAME} ] && \
@@ -41,8 +43,8 @@ if [ "$1" == "-d" ] ; then
 	rm_if_exists -d $SRC_DIRS/build
 	rm_if_exists -d $SRC_DIRS/dist
 	rm_if_exists -d dist
-	find . -type d -name "__pycache__" -exec rm_if_exists  -d  {} \;
-	rm_if_exists -d $WORK_DIR
+	find . -type d -name "__pycache__" -exec bash -c 'rm_if_exists -d "{}"' \;
+	find $WORK_DIR -type f -mindepth 1 -maxdepth 1 -exec bash -c 'rm_if_exists "{}"' \;
 
 	exit 0
 fi
