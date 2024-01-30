@@ -22,10 +22,10 @@ def print_source_url(name, version):
         "checksum": "",
     }
     with PyPISimple() as client:
-        requests_page = client.get_project_page(name)
+        requests_page = client.get_project_page(name, timeout=10.0)
     for request in requests_page.packages:
         if (
-            request.project == name
+            request.project.lower() == name.lower()
             and request.version == version
             and request.package_type == "sdist"
         ):
@@ -35,7 +35,7 @@ def print_source_url(name, version):
     if package["url"] == "" or package["checksum"] == "":
         print(
             f"Could not find source url and/or checksum for package {name} version {version}",
-            sys.stderr,
+            file=sys.stderr,
         )
         sys.exit(1)
     print(
