@@ -12,8 +12,9 @@ DOCXX
 
 # Ask to publish unless on main branch
 git_branch=$(git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/\1/p')
-yn "Your git branch is '$git_branch' - are you sure you want to publish?" || \
-	fail "Not publishing this"
+[ "$git_branch" == "main" ] ||\
+	yn "Your git branch is '$git_branch' - are you sure you want to publish?" || \
+		fail "Not publishing this"
 
 project=$(poetry version|cut -d" " -f1)
 version=$(poetry version|cut -d" " -f2)
