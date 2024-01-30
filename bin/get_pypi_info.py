@@ -32,6 +32,12 @@ def print_source_url(name, version):
             package["url"] = request.url
             package["checksum"] = request.digests["sha256"]
             break
+    if package["url"] == "" or package["checksum"] == "":
+        print(
+            f"Could not find source url and/or checksum for package {name} version {version}",
+            sys.stderr,
+        )
+        sys.exit(1)
     print(
         f'  resource "{name}" do\n'
         f"    url \"{package['url']}\"\n"
