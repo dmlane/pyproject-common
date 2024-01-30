@@ -30,8 +30,18 @@ require_commands() {
 	done
 	[ $problem_count -gt 0 ] && fail "Cannot continue"
 }
-
+# Prompt user for Y or N - succeeds if Y
+function yn {
+    while :
+    do
+        read -p "${1}? " -n 1 -r
+        [[ $REPLY =~ ^[YynN] ]] && echo " "
+        [[ $REPLY =~ ^[Yy] ]] && return 0
+        [[ $REPLY =~ ^[Nn] ]] && return 1
+        echo -ne "\033[0K\r"
+    done
+}
 fail() { echo -e "${RED}$1 - aborting ??????????${NC}"; exit 1;}
-export -f highlight fail require_commands
+export -f highlight fail require_commands yn
 export YELLOW GREEN RED 
 
