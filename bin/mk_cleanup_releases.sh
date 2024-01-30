@@ -31,9 +31,7 @@ do
 	(( MIN_VERSIONS-- ))
 	[ $MIN_VERSIONS -ge 0 ] && continue
 	release_date=$(date -d "$dt" +"%s")
-	set -xv
 	[ $release_date -lt $SECS_CUTOFF ] && fury yank $PROJECT_NAME -v $release
-	set +xv
 done
 
 # Updated list
