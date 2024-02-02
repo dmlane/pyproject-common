@@ -86,7 +86,7 @@ clean:
 
 .PHONY: check
 check:
-	pylint $(PYTHON_FILES)
+	@pylint $(PYTHON_FILES)
 
 $(PROJECT_NAME).tmpl: poetry.lock
 	$(DISPLAY)
