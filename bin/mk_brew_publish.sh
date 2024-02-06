@@ -10,6 +10,8 @@ DOCXX
 
 . ${0%/*}/.bash.common
 
+[ $WORK_DIR ] || fail "Expected to find WORK_DIR from MAKE environment"
+
 # Ask to publish unless on main branch
 git_branch=$(git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/\1/p')
 [ "$git_branch" == "main" ] ||\
@@ -19,7 +21,7 @@ git_branch=$(git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/\1/p')
 project=$(poetry version|cut -d" " -f1)
 version=$(poetry version|cut -d" " -f2)
 config=${project}.rb
-template=${project}.tmpl
+template=${WORK_DIR}/${project}.tmpl
 
 url="https://github.com/dmlane/${project}/archive/refs/tags/${version}.tar.gz"
 

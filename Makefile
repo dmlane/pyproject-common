@@ -38,7 +38,7 @@ $(WORK_DIR)/%.build: $(WORK_DIR)/%.bumpver
 	@$(POETRY) build  --format wheel
 	@touch $@
 
-$(WORK_DIR)/%.bumpver: Makefile pyproject.toml $(PROJECT_NAME).tmpl $(PYTHON_FILES)
+$(WORK_DIR)/%.bumpver: Makefile pyproject.toml $(WORK_DIR)/$(PROJECT_NAME).tmpl $(PYTHON_FILES)
 	$(DISPLAY)
 	@$(BUMPVER)
 	@-rm -r dist 2>/dev/null
@@ -88,7 +88,7 @@ clean:
 check:
 	@pylint $(PYTHON_FILES)
 
-$(PROJECT_NAME).tmpl: poetry.lock
+$(WORK_DIR)/$(PROJECT_NAME).tmpl: poetry.lock
 	$(DISPLAY)
 	@$(HELPER)/mk_tmpl_includes.sh
 

@@ -31,8 +31,8 @@ highlight "Fetching python resources for ^$PROJECT_NAME^"
 ${HELPER}/get_pypi_info.py ${WF}/poetry.packages >${WF}.include ||\
 	fail "'${HELPER}/get_pypi_info.py ${WF}/poetry.package' returned error"
 
-gsed "/#---START-RESOURCES---/,/#---END-RESOURCES---/!b;//!d;/#---START-RESOURCES---/r ${WF}.include" ${PROJECT_NAME}.tmpl >${PROJECT_NAME}.tmpl.new ||\
+gsed "/#---START-RESOURCES---/,/#---END-RESOURCES---/!b;//!d;/#---START-RESOURCES---/r ${WF}.include" ${PROJECT_NAME}.tmpl >${WORK_DIR}/${PROJECT_NAME}.tmpl.new ||\
 	fail "gsed had a problem"
 
-mv -f ${PROJECT_NAME}.tmpl.new ${PROJECT_NAME}.tmpl
+mv -f ${WORK_DIR}/${PROJECT_NAME}.tmpl.new ${WORK_DIR}/${PROJECT_NAME}.tmpl
 
