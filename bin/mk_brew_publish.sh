@@ -13,11 +13,11 @@ DOCXX
 [ $WORK_DIR ] || fail "Expected to find WORK_DIR from MAKE environment"
 build_homebrew=$(python -c 'import toml;print(toml.load("pyproject.toml")["tool"]["homebrew"]["build"])' 2>/dev/null)
 case "$build_homebrew" in
-	"") echo "*** Warning - tool.homebrew.build not found in pyproject.toml - building anyway ***";;
-	"False") 	echo "tool.homebrew.build = False  # *** Skipping build ***"
+	"") highlight "*** ^Warning^ - tool.homebrew.build not found in pyproject.toml - ^building anyway^ ***";;
+	"False") 	highlight "tool.homebrew.build = False   ^*** Skipping build ***^"
 				exit 0;;
 	"True")		:;;
-	*)	echo "*** Error - tool.homebrew.build=$build_homebrew should be True or False ***"
+	*)	highlight "*** Error - tool.homebrew.build=^$build_homebrew^ should be ^True^ or ^False^ ***"
 		exit 1;;
 esac
 
