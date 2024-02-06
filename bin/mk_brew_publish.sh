@@ -11,6 +11,15 @@ DOCXX
 . ${0%/*}/.bash.common
 
 [ $WORK_DIR ] || fail "Expected to find WORK_DIR from MAKE environment"
+build_homebrew=$(python -c 'import toml;print(toml.load("pyproject.toml")["tool"]["homebrew"]["build"])' 2>/dev/null)
+case "$build_homebrew" in
+	"") echo "*** Warning - tool.homebrew.build not found in pyproject.toml - building anyway ***";;
+	"False") 	echo "tool.homebrew.build = False  # *** Skipping build ***"
+				exit 0;;
+	"True")		:;;
+	*)	echo "*** Error - tool.homebrew.build=$build_homebrew should be True or False ***"
+		exit 1;;
+esac
 
 # Ask to publish unless on main branch
 git_branch=$(git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/\1/p')
