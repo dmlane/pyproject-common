@@ -37,7 +37,7 @@ if [ "$1" == "-d" ] ; then
 		highlight "    Removing virtualenv ${PROJECT_NAME}" &&
 		pyenv virtualenv-delete -f ${PROJECT_NAME} 2>/dev/null &&\
 		rm  $MKFLAG_VIRTUALENV 2>/dev/null
-	rm_if_exists poetry.lock 
+	#rm_if_exists poetry.lock 
 	rm_if_exists .python-version 
 	rm_if_exists -d .pytest_cache
 	rm_if_exists -d $SRC_DIRS/build
