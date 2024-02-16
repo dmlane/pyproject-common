@@ -66,7 +66,13 @@ fi
 echo "    Installing dependencies from pyproject.toml"
 (
 #. ~/.pyenv/plugins/pyenv-virtualenv/shims/activate 2>/dev/null && poetry install
-pyenv sh-activate >/dev/null && poetry install
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+pyenv activate ${PROJECT_NAME}
+if [ $? -eq 0 ] ; then
+	poetry install
+	pyenv rehash
+fi
 )
 [ $? -ne 0 ] && fail "Could not install dependencies"
 exit 0
