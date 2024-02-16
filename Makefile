@@ -1,21 +1,22 @@
 ## Config
-export PROJECT_NAME = $(shell poetry version|cut -d" " -f1)
-PYTHON_FILES =  $(shell find src/ tests/ -type f -name '*.py')
-export HELPER=.common/bin
-export SRC_DIRS = src/$(subst dml-,,$(PROJECT_NAME))
-export WORK_DIR = ${HOME}/.cache/dml.poetry/$(PROJECT_NAME)
+MAKEFLAGS += --no-builtin-rules
+export PROJECT_NAME := $(shell poetry version|cut -d" " -f1)
+PYTHON_FILES :=  $(shell find src/ tests/ -type f -name '*.py')
+export HELPER:=.common/bin
+export SRC_DIRS := src/$(subst dml-,,$(PROJECT_NAME))
+export WORK_DIR := ${HOME}/.cache/dml.poetry/$(PROJECT_NAME)
 POETRY := $(shell command -v poetry 2> /dev/null)
 PYENV := $(shell command -v pyenv 2> /dev/null)
 -include $(WORK_DIR)/.versions
 
 # Flags used by helpers
-export BUMPVER_FLAG = $(WORK_DIR)/bumpver_versions.flg
+export BUMPVER_FLAG := $(WORK_DIR)/bumpver_versions.flg
 
 ifdef TERM
-BOLD_COLOR = $(shell tput setaf 3)
-HELP_COLOR = $(shell tput setaf 6)
-HEADER_COLOR = $(BOLD_COLOR)$(shell tput setaf 2)
-NO_COLOR = $(shell tput sgr0)
+BOLD_COLOR := $(shell tput setaf 3)
+HELP_COLOR := $(shell tput setaf 6)
+HEADER_COLOR := $(BOLD_COLOR)$(shell tput setaf 2)
+NO_COLOR := $(shell tput sgr0)
 endif
 define DISPLAY
     @printf "Setting up $(BOLD_COLOR)$@$(NO_COLOR) ...........\n"
@@ -93,10 +94,12 @@ $(WORK_DIR)/$(PROJECT_NAME).tmpl: poetry.lock
 	@$(HELPER)/mk_tmpl_includes.sh
 
 # Generate include file
+.PRECIOUS: $(WORK_DIR)/.versions
 $(WORK_DIR)/.versions: pyproject.toml
 	@bumpver  update  -t final -d 2>&1 >/dev/null |sed -n 's/^.*New Version: /RELEASE_VERSION=/p'   >$@
 	@bumpver  update -t rc --tag-num -d 2>&1 >/dev/null |sed -n 's/^.*New Version: /RC_VERSION=/p' >>$@
 	@$(POETRY) version -s|sed 's/^/VERSION=/' >>$@
+
 # Not normally called
 .PHONY: vars
 vars:
