@@ -44,11 +44,11 @@ if [ "$1" == "-d" ] ; then
 	rm_if_exists -d $SRC_DIRS/dist
 	rm_if_exists -d dist
 	find . -type d -name "__pycache__" -exec bash -c 'rm_if_exists -d "{}"' \;
-	find $WORK_DIR -type f -mindepth 1 -maxdepth 1 -exec bash -c 'rm_if_exists "{}"' \;
+	find $WORK_DIR -type f ! -name ".versions" -mindepth 1 -maxdepth 1 -exec bash -c 'rm_if_exists "{}"' \;
 
 	exit 0
 fi
-
+rm_if_exists poetry.lock
 [ ! -d $WORK_DIR ] && mkdir -p $WORK_DIR 
 
 if [ ! -f $MKFLAG_VIRTUALENV ] ; then
@@ -65,7 +65,8 @@ fi
 # Following NEEDS to be run in a subshell to work
 echo "    Installing dependencies from pyproject.toml"
 (
-. ~/.pyenv/plugins/pyenv-virtualenv/shims/activate 2>/dev/null && poetry install
+#. ~/.pyenv/plugins/pyenv-virtualenv/shims/activate 2>/dev/null && poetry install
+pyenv sh-activate >/dev/null && poetry install
 )
 [ $? -ne 0 ] && fail "Could not install dependencies"
 exit 0
