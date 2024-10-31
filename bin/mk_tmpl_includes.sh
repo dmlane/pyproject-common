@@ -19,20 +19,21 @@ require_commands gsed
 
 WF=$(mktemp -d)
 function on_exit {
-    rm -rf ${WF}* 2>/dev/null
+    rm -rf ${WF} 2>/dev/null
     exit
 }
 [ $NO_CLEANUP ] || trap on_exit 0 1 2 15
-
+POETRY_PACKAGES=${WF}/poetry.packages
+INCLUDE_FILE=${WF}/include
+TEMP_OUTPUT=${WORK_DIR}/${PROJECT_NAME}.tmpl.new
 highlight "Getting a list of packages from Poetry"
-poetry show --only main >${WF}/poetry.packages
+poetry show --only main >${POETRY_PACKAGES}
 
 highlight "Fetching python resources for ^$PROJECT_NAME^"
-${HELPER}/get_pypi_info.py ${WF}/poetry.packages >${WF}.include ||\
+${HELPER}/get_pypi_info.py ${POETRY_PACKAGES} >${INCLUDE_FILE} ||\
 	fail "'${HELPER}/get_pypi_info.py ${WF}/poetry.package' returned error"
 
-gsed "/#---START-RESOURCES---/,/#---END-RESOURCES---/!b;//!d;/#---START-RESOURCES---/r ${WF}.include" ${PROJECT_NAME}.tmpl >${WORK_DIR}/${PROJECT_NAME}.tmpl.new ||\
+gsed "/#---START-RESOURCES---/,/#---END-RESOURCES---/!b;//!d;/#---START-RESOURCES---/r ${INCLUDE_FILE}" ${PROJECT_NAME}.tmpl >${TEMP_OUTPUT} ||\
 	fail "gsed had a problem"
-
-mv -f ${WORK_DIR}/${PROJECT_NAME}.tmpl.new ${WORK_DIR}/${PROJECT_NAME}.tmpl
+mv -f ${TEMP_OUTPUT} ${WORK_DIR}/${PROJECT_NAME}.tmpl
 
