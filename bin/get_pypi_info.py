@@ -23,9 +23,10 @@ def print_source_url(name, version):
     }
     with PyPISimple() as client:
         requests_page = client.get_project_page(name, timeout=10.0)
+
     for request in requests_page.packages:
         if (
-            request.project.lower() == name.lower()
+            (request.project.lower() == name.lower() or request.project.lower()== name.lower().replace("-", "_"))
             and request.version == version
             and request.package_type == "sdist"
         ):
