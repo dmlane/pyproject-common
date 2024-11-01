@@ -9,7 +9,9 @@
 DOCXX
 
 . ${0%/*}/.bash.common
-
+LOCAL_TAP=~/.config/my-homebrew-tap
+REMOTE_TAP="git@github.com:dmlane/homebrew-tap.git"
+[ -d ~/.config ] || mkdir ~/.config
 [ $WORK_DIR ] || fail "Expected to find WORK_DIR from MAKE environment"
 build_homebrew=$(python -c 'import toml;print(toml.load("pyproject.toml")["tool"]["homebrew"]["build"])' 2>/dev/null)
 case "$build_homebrew" in
@@ -20,6 +22,15 @@ case "$build_homebrew" in
 	*)	highlight "*** Error - tool.homebrew.build=^$build_homebrew^ should be ^True^ or ^False^ ***"
 		exit 1;;
 esac
+
+# Pull the homebrew tap if not already done
+if [ ! -d $LOCAL_TAP ] ; then
+	git clone $REMOTE_TAP $LOCAL_TAP
+	if [ $? -ne 0 ] ; then
+		highlight "Could not clone $REMOTE_TAP"
+		exit 1
+	fi
+fi
 
 # Ask to publish unless on main branch
 git_branch=$(git branch 2> /dev/null | sed -n -e 's/^\* \(.*\)/\1/p')
@@ -40,10 +51,10 @@ function get_url {
 }
 
 sha=$(get_url|sha256sum|cut -d" " -f1)
-sed -e "s?#URL#?$url?" -e "s/#SHA256#/$sha/" $template >../homebrew-tap/Formula/$config
+sed -e "s?#URL#?$url?" -e "s/#SHA256#/$sha/" $template >${LOCAL_TAP}/Formula/$config
 [ $? -ne 0 ] && fail "sed failed"
 
-cd ../homebrew-tap/Formula
+cd ${LOCAL_TAP}/Formula
 git add $config || exit 1
 git commit -m "Updated $config to release $version" || exit 1
 git push || exit 1
