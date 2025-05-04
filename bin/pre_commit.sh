@@ -35,7 +35,7 @@ do
 	echo -e "    ${GREEN}${fn}${NC}"
 done
 
-run_check black --check 
+run_check black --check --diff
 run_check isort --check-only 
 run_check pylint -rn -sn 
 
