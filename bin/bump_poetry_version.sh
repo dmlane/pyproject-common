@@ -8,23 +8,15 @@ set -euo pipefail
 # - Resets BUILD to 1 if the month has changed (YYYY.MM.1)
 # - Otherwise increments BUILD (YYYY.MM.n+1)
 # - Uses Git to commit and tag the new version
+# - Reverts the change if git push fails
 #
 # USAGE:
 #   ./bump_poetry_version.sh          # Run safely (fails if uncommitted changes)
 #   ./bump_poetry_version.sh --force # Force run even with uncommitted changes
-#
-# REQUIREMENTS:
-# - `poetry` must be installed and available in PATH
-# - Git working directory must be initialized
-#
-# OUTPUT:
-# - Updates [tool.poetry].version in pyproject.toml
-# - Creates Git commit and tag (e.g., "2025.5.1")
 ###############################################################################
 
 FORCE=false
 
-# Parse optional --force flag
 if [[ "${1:-}" == "--force" ]]; then
   FORCE=true
 fi
@@ -35,7 +27,7 @@ if ! command -v poetry &> /dev/null; then
   exit 1
 fi
 
-# Check that git working directory is clean
+# Check git is clean
 if [[ "$FORCE" == false ]]; then
   if [[ -n $(git status --porcelain) ]]; then
     echo "❌ Git working directory is not clean. Use --force to override."
@@ -46,15 +38,13 @@ else
   echo "⚠️ Skipping Git clean check (forced)"
 fi
 
-# Get current version from pyproject.toml
+# Capture current version
 CURRENT_VERSION=$(poetry version -s)
 IFS='.' read -r CUR_YEAR CUR_MONTH CUR_BUILD <<< "$CURRENT_VERSION"
 
-# Get current date
 NOW_YEAR=$(date +%Y)
 NOW_MONTH=$(date +%-m)
 
-# Determine next version
 if [[ "$CUR_YEAR" -ne "$NOW_YEAR" || "$CUR_MONTH" -ne "$NOW_MONTH" ]]; then
   NEW_VERSION="$NOW_YEAR.$NOW_MONTH.1"
 else
@@ -64,14 +54,28 @@ fi
 
 echo "🔄 Bumping version: $CURRENT_VERSION → $NEW_VERSION"
 
-# Update version using poetry
+# Update version
 poetry version "$NEW_VERSION"
 
 # Commit and tag
 git add pyproject.toml
 git commit -m "Bump version to $NEW_VERSION"
 git tag "$NEW_VERSION"
-git push && git push origin "$NEW_VERSION"
 
-echo "✅ Version bumped and tagged as $NEW_VERSION"
+# Try pushing changes
+if ! git push && git push origin "$NEW_VERSION"; then
+  echo "❌ Git push failed — reverting version..."
+
+  # Revert pyproject.toml version
+  poetry version "$CURRENT_VERSION"
+
+  # Reset git state
+  git reset --hard HEAD~1
+  git tag -d "$NEW_VERSION"
+
+  echo "✅ Reverted to version $CURRENT_VERSION. Exiting with failure."
+  exit 1
+fi
+
+echo "✅ Version bumped and pushed: $NEW_VERSION"
 
