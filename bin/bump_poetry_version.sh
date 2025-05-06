@@ -15,6 +15,7 @@ set -euo pipefail
 #   ./bump_poetry_version.sh --force # Force run even with uncommitted changes
 ###############################################################################
 
+set -xv
 FORCE=false
 
 if [[ "${1:-}" == "--force" ]]; then
