@@ -22,32 +22,16 @@ define DISPLAY
     @printf "Setting up $(BOLD_COLOR)$@$(NO_COLOR) ...........\n"
 endef
 #------------------------------------------------------
-$(WORK_DIR)/%.rel: $(WORK_DIR)/%.homebrew
-	@$(CLEANUP)
-	@rm -r dist
-	@touch $@
-$(WORK_DIR)/%.homebrew: $(WORK_DIR)/%.fury
-	$(DISPLAY)
-	@$(HELPER)/mk_brew_publish.sh
-	@touch $@
-$(WORK_DIR)/%.fury: $(WORK_DIR)/%.build
-	$(DISPLAY)
-	@fury push --public dist/$(subst -,_,$(PROJECT_NAME))-*.whl
-	@touch $@
-$(WORK_DIR)/%.build: $(WORK_DIR)/%.bumpver
-	$(DISPLAY)
-	@$(POETRY) build  --format wheel
+$(WORK_DIR)/%.rel: $(WORK_DIR)/%.bumpver
 	@touch $@
 
 $(WORK_DIR)/%.bumpver: Makefile pyproject.toml $(WORK_DIR)/$(PROJECT_NAME).tmpl $(PYTHON_FILES)
 	$(DISPLAY)
-	@$(BUMPVER)
-	@-rm -r dist 2>/dev/null
+	$(BUMPVER)
 	@touch $@
 
 #------------------------------------------------------
 rc: BUMPVER = bumpver update -t rc --tag-num
-rc: CLEANUP = echo "$(HELP_COLOR)Skipping cleanup (will be done on release)$(NO_COLOR)"
 rc: $(WORK_DIR)/rc.rel
 
 help:  ## List all commands
@@ -69,7 +53,6 @@ test:
 	pytest
 
 release: BUMPVER = bumpver update -t final
-release: CLEANUP = $(HELPER)/mk_cleanup_releases.sh
 release: $(WORK_DIR)/release.rel
 	
 
@@ -91,13 +74,12 @@ check:
 
 $(WORK_DIR)/$(PROJECT_NAME).tmpl: poetry.lock
 	$(DISPLAY)
-	@$(HELPER)/mk_tmpl_includes.sh
 
 # Generate include file
 .PRECIOUS: $(WORK_DIR)/.versions
 $(WORK_DIR)/.versions: pyproject.toml
-	@bumpver  update  -t final -d 2>&1 >/dev/null |sed -n 's/^.*New Version: /RELEASE_VERSION=/p'   >$@
-	@bumpver  update -t rc --tag-num -d 2>&1 >/dev/null |sed -n 's/^.*New Version: /RC_VERSION=/p' >>$@
+	bumpver  update  -t final -d 2>&1 >/dev/null |sed -n 's/^.*New Version: /RELEASE_VERSION=/p'   >$@
+	bumpver  update -t rc --tag-num -d 2>&1 >/dev/null |sed -n 's/^.*New Version: /RC_VERSION=/p' >>$@
 	@$(POETRY) version -s|sed 's/^/VERSION=/' >>$@
 
 # Not normally called

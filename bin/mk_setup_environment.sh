@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2086,SC2156
 : << DOCXX
 #------------------------------------------------------------------------------
 #          Name:    mk_setup_environment.sh
@@ -33,11 +34,9 @@ export -f rm_if_exists
 MKFLAG_VIRTUALENV=${WORK_DIR}/virtualenv.flg
 if [ "$1" == "-d" ] ; then
 	[ -d /Users/dave/.pyenv/versions/${PROJECT_NAME} ] && \
-#	[ $MKFLAG_VIRTUALENV ] && \
 		highlight "    Removing virtualenv ${PROJECT_NAME}" &&
 		pyenv virtualenv-delete -f ${PROJECT_NAME} 2>/dev/null &&\
 		rm  $MKFLAG_VIRTUALENV 2>/dev/null
-	#rm_if_exists poetry.lock 
 	rm_if_exists .python-version 
 	rm_if_exists -d .pytest_cache
 	rm_if_exists -d $SRC_DIRS/build
@@ -52,8 +51,9 @@ rm_if_exists poetry.lock
 [ ! -d $WORK_DIR ] && mkdir -p $WORK_DIR 
 
 if [ ! -f $MKFLAG_VIRTUALENV ] ; then
-	pyenv virtualenv $PROJECT_NAME
-	[ $? -ne 0 ] && fail "Unable to install virtualenv '$PROJECT_NAME'"
+	if ! pyenv virtualenv $PROJECT_NAME ; then
+		fail "Unable to install virtualenv '$PROJECT_NAME'"
+	fi
 	touch $MKFLAG_VIRTUALENV
 fi
 
@@ -65,15 +65,12 @@ fi
 # Following NEEDS to be run in a subshell to work
 echo "    Installing dependencies from pyproject.toml"
 (
-#. ~/.pyenv/plugins/pyenv-virtualenv/shims/activate 2>/dev/null && poetry install
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
-pyenv activate ${PROJECT_NAME}
-if [ $? -eq 0 ] ; then
+if pyenv activate ${PROJECT_NAME} ; then
 	poetry install
 	pyenv rehash
 fi
-)
-[ $? -ne 0 ] && fail "Could not install dependencies"
+) || fail "Could not install dependencies"
 exit 0
 
