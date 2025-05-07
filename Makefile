@@ -21,7 +21,7 @@ endef
 $(WORK_DIR)/%.rel: $(WORK_DIR)/%.bumpver
 	@touch $@
 
-$(WORK_DIR)/%.bumpver: Makefile pyproject.toml $(WORK_DIR)/$(PROJECT_NAME).tmpl $(PYTHON_FILES)
+$(WORK_DIR)/%.bumpver: Makefile pyproject.toml poetry.lock $(PYTHON_FILES)
 	$(DISPLAY)
 	$(HELPER)/bump_poetry_version.sh
 	@touch $@
@@ -64,6 +64,4 @@ clean:
 check:
 	@pylint $(PYTHON_FILES)
 
-$(WORK_DIR)/$(PROJECT_NAME).tmpl: poetry.lock
-	$(DISPLAY)
 
