@@ -21,7 +21,7 @@ set -euo pipefail
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 
 if [[ "$current_branch" != "main" ]]; then
-  echo "Error: You must be on the 'main' branch to bump the version. Current branch: $current_branch"
+  echo "❌ You must be on the 'main' branch to bump the version. Current branch: $current_branch"
   exit 1
 fi
 
