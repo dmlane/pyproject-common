@@ -86,6 +86,7 @@ if ! git tag -a "$NEW_VERSION" -m "New release $NEW_VERSION"; then
 fi
 
 # Push commit and tag
+exit 0
 if ! ( git push && git push origin "$NEW_VERSION" ); then
   echo "❌ git push failed — reverting version bump..."
   poetry version "$CURRENT_VERSION"
