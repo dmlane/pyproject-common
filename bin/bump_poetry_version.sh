@@ -37,6 +37,9 @@ if ! command -v poetry &> /dev/null; then
   exit 1
 fi
 
+# Make sure poetry.lock is up to date
+poetry lock --quiet
+
 # Ensure git is clean unless --force
 if [[ "$FORCE" == false ]]; then
   if [[ -n $(git status --porcelain) ]]; then
